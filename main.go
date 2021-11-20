@@ -14,6 +14,7 @@ func main() {
 	println("success")
 	do(err, c)
 	do(err, c)
+	c.Close()
 }
 
 func do(err error, c *client.Client) {
@@ -30,6 +31,10 @@ func do(err error, c *client.Client) {
 		Buttons: []*codec.Button{
 			{
 				Label: "YES",
+
+				Url: "https://baidu.com",
+			}, {
+				Label: "NO",
 				Url:   "https://baidu.com",
 			}, {
 				Label: "NO",
@@ -40,10 +45,6 @@ func do(err error, c *client.Client) {
 	if err != nil {
 		panic(err)
 	}
-	msg, suc := c.Read()
-	println(msg.Payload)
-	println(suc)
 	time.Sleep(time.Second * 15)
-	c.Close()
 	println("success")
 }

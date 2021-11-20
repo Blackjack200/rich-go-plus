@@ -33,7 +33,24 @@ func (c *Client) SetActivity(a *codec.Activity) error {
 	if err != nil {
 		return nil
 	}
-	return c.c.Send(codec.OpcodeFrame, string(payload))
+	if err := c.c.Send(codec.OpcodeFrame, string(payload)); err != nil {
+		return err
+	}
+	msg, suc := c.c.Read()
+	m := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(msg.Payload), &m); err == nil {
+		if d, ok := m["evt"]; ok {
+			if s, ok := d.(string); ok {
+				if s == "ERROR" {
+					return fmt.Errorf("error when setactivity: %v", msg.Payload)
+				}
+			}
+		}
+	}
+	if suc && msg.Success() {
+		return nil
+	}
+	return fmt.Errorf("error when setactivity: %v", msg.Payload)
 }
 
 func getNonce() string {
